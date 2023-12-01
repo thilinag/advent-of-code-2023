@@ -2,8 +2,9 @@
 
 ## Template
 ```
-const input = document.body.innerText.trim();
-// const input = ``; // sample input
+const input = ``; // sample input
+// const input = document.body.innerText.trim(); 
+
 const data = input.split("\n");
 
 const part1 = (data) => {
@@ -22,5 +23,8 @@ part2(data);
 console.timeEnd("part2");
 ```
 
+## Solving
+Using `bun` to run the solution in terminal.
+
 ## Getting answers
-I'm running the solution code in the browser console of input page of the day to get the answer
+Running the solution code in the browser console of input page of the day to get the answer.
