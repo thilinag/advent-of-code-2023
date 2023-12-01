@@ -3,6 +3,7 @@
 ## Template
 ```
 const input = document.body.innerText.trim();
+// const input = ``; // sample input
 const data = input.split("\n");
 
 const part1 = (data) => {
