@@ -1,0 +1,11 @@
+{
+    "name": "advent-of-code-2023",
+    "version": "1.0.0",
+    "repository": "git@github.com:thilinag/advent-of-code-2023.git",
+    "author": "Thilina Gunasekara <thilina.gunasekara@gmail.com>",
+    "license": "MIT",
+    "dependencies": {},
+    "devDependencies": {
+        "prettier": "^3.1.0"
+    }
+}

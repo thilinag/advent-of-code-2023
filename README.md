@@ -1,9 +1,10 @@
 # Advent of code 2023
 
 ## Template
+
 ```
 const input = ``; // sample input
-// const input = document.body.innerText.trim(); 
+// const input = document.body.innerText.trim();
 
 const data = input.split("\n");
 
@@ -24,7 +25,9 @@ console.timeEnd("part2");
 ```
 
 ## Solving
+
 Using `bun` to run the solution in terminal.
 
 ## Getting answers
+
 Running the solution code in the browser console of input page of the day to get the answer.
