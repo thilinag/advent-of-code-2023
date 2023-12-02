@@ -14,7 +14,7 @@ const part2Data = {
   4nineeightseven2
   zoneight234
   7pqrstsixteen`,
-    answer: 2811,
+    answer: 281,
 };
 
 const sampleData = [part1Data, part2Data];
