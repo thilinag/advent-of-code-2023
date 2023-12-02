@@ -58,12 +58,10 @@ const part2 = () => {
     // but we need ['one', 'eight'] for eg 'oneeight'
     // https://stackoverflow.com/a/33903830
 
+    const regexp = new RegExp(`(?=(\\d|${letterNumbers.join('|')}))`, 'g');
+
     const numbers = data.map((line) =>
-        [
-            ...line.matchAll(
-                /(?=(\d|one|two|three|four|five|six|seven|eight|nine))/g,
-            ),
-        ]
+        [...line.matchAll(regexp)]
             .map((match) => match[1])
             .map((n) =>
                 /\d/.test(n) ? Number(n) : letterNumbers.indexOf(n) + 1,
