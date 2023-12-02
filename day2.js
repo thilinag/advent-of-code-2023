@@ -78,20 +78,14 @@ const part2 = () => {
             )
             // find lowest possible game
             .reduce(
-                (lowestPossibleGame, { red, green, blue }) => {
+                (
+                    { red, green, blue },
+                    { red: currentRed, green: currentGreen, blue: currentBlue },
+                ) => {
                     return {
-                        red:
-                            lowestPossibleGame.red < red
-                                ? red
-                                : lowestPossibleGame.red,
-                        blue:
-                            lowestPossibleGame.blue < blue
-                                ? blue
-                                : lowestPossibleGame.blue,
-                        green:
-                            lowestPossibleGame.green < green
-                                ? green
-                                : lowestPossibleGame.green,
+                        red: red < currentRed ? currentRed : red,
+                        blue: blue < currentBlue ? currentBlue : blue,
+                        green: green < currentGreen ? currentGreen : green,
                     };
                 },
                 { red: 0, blue: 0, green: 0 },
