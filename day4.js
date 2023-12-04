@@ -41,10 +41,38 @@ const part1 = () => {
     );
 };
 
+const scratch = (winningCounts, index, cards = {}) => {
+    for (let i = index; i < index + winningCounts[index - 1]; i++) {
+        const card = i + 1;
+        cards[card] = cards[card] ? cards[card] + 1 : 1;
+
+        scratch(winningCounts, card, cards);
+    }
+
+    return cards;
+};
+
 const part2 = () => {
     const data = getData(2);
-    // part 2 code
-    // return ;
+
+    const winningCounts = data.map((game) => {
+        const [myNumbers, winningNumbers] = game
+            .split(': ')[1]
+            .split(' | ')
+            .map((numbers) => numbers.split(' ').filter(Boolean));
+
+        return myNumbers.filter((number) => winningNumbers.includes(number))
+            .length;
+    });
+
+    const scratchCards = winningCounts.map((count, index) => {
+        return Object.values(scratch(winningCounts, index + 1)).reduce(
+            (sum, c) => sum + c,
+            0,
+        );
+    });
+
+    return scratchCards.reduce((sum, c) => sum + c, 0) + data.length;
 };
 
 console.time('part1');
