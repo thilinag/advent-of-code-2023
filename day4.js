@@ -41,12 +41,12 @@ const part1 = () => {
     );
 };
 
-const scratch = (winningCounts, index, cards = {}) => {
+const keepScratching = (winningCounts, index, cards = {}) => {
     for (let i = index; i < index + winningCounts[index - 1]; i++) {
         const card = i + 1;
-        cards[card] = cards[card] ? cards[card] + 1 : 1;
+        cards[card] = +cards[card] ? cards[card] + 1 : 1;
 
-        scratch(winningCounts, card, cards);
+        keepScratching(winningCounts, card, cards);
     }
 
     return cards;
@@ -65,14 +65,18 @@ const part2 = () => {
             .length;
     });
 
-    const scratchCards = winningCounts.map((count, index) => {
-        return Object.values(scratch(winningCounts, index + 1)).reduce(
-            (sum, c) => sum + c,
+    const scratchCardCopiesCounts = winningCounts.map((_, index) => {
+        return Object.values(keepScratching(winningCounts, index + 1)).reduce(
+            (sumOfCardTotal, cardTotal) => sumOfCardTotal + cardTotal,
             0,
         );
     });
 
-    return scratchCards.reduce((sum, c) => sum + c, 0) + data.length;
+    // total of copied + original scratchcards
+    return (
+        scratchCardCopiesCounts.reduce((sum, cardCount) => sum + cardCount, 0) +
+        data.length
+    );
 };
 
 console.time('part1');
