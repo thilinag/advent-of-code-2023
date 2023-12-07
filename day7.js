@@ -8,8 +8,8 @@ QQQJA 483`,
 };
 
 const part2Data = {
-    sample: ``,
-    answer: 0,
+    sample: part1Data.sample,
+    answer: 5905,
 };
 
 const sampleData = [part1Data, part2Data];
@@ -101,9 +101,59 @@ const part1 = () => {
 };
 
 const part2 = () => {
-    const data = getData(2);
-    // part 2 code
-    // return ;
+    const data = getData(2).map((line) => {
+        const [hand, bid] = line.split(' ');
+        const handData = {};
+
+        hand.split('').forEach((card) => {
+            handData[card] = handData[card] ? handData[card] + 1 : 1;
+        });
+
+        // set jokers
+        const { J = 0, ...restHandData } = handData;
+        const [first = J, ...restSortedHadData] = Object.entries(
+            restHandData || [],
+        ).sort((a, b) => b[1] - a[1]);
+        const jokerHandData = {
+            ...{ [first[0]]: first[1] + J },
+            ...(restSortedHadData ? Object.fromEntries(restSortedHadData) : {}),
+        };
+
+        return {
+            type: getType(jokerHandData),
+            hand,
+            bid: Number(bid),
+        };
+    });
+
+    const orderedHands = data.sort((a, b) => {
+        if (a.type > b.type) {
+            return 1;
+        }
+
+        if (a.type === b.type) {
+            let strengthOrder;
+            for (let i = 0; i < a.hand.length; i++) {
+                const aStrength =
+                    a.hand[i] === 'J' ? Infinity : strength.indexOf(a.hand[i]);
+                const bStrength =
+                    b.hand[i] === 'J' ? Infinity : strength.indexOf(b.hand[i]);
+
+                if (aStrength !== bStrength) {
+                    strengthOrder = bStrength - aStrength;
+                    break;
+                }
+            }
+            return strengthOrder;
+        }
+
+        return -1;
+    });
+
+    return orderedHands.reduce(
+        (total, hand, i) => total + hand.bid * (i + 1),
+        0,
+    );
 };
 
 console.time('part1');
