@@ -19,18 +19,28 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-const race = (times, records) => {
+const raceNicely = (times, records) => {
     return times
         .map((time, game) => {
-            let winCount = 0;
-            for (let i = 0; i < time; i++) {
-                if ((time - i) * i > records[game]) {
-                    winCount++;
-                }
-            }
-            return winCount;
+            const root = Math.sqrt(time * time - 4.0 * records[game]);
+            const upper = Math.ceil((time + root) / 2.0);
+            const lower = Math.floor((time - root) / 2.0);
+
+            return upper - lower - 1;
         })
         .reduce((sum, c) => sum * c, 1);
+};
+
+const race = (times, records) => {
+    return times.map((time, game) => {
+        let winCount = 0;
+        for (let i = 0; i < time; i++) {
+            if ((time - i) * i > records[game]) {
+                winCount++;
+            }
+        }
+        return winCount;
+    });
 };
 
 const part1 = () => {
@@ -39,7 +49,7 @@ const part1 = () => {
         line.split(':')[1].match(/\d+/g).map(Number),
     );
 
-    return race(times, records);
+    return raceNicely(times, records);
 };
 
 const part2 = () => {
@@ -48,7 +58,7 @@ const part2 = () => {
         Number(line.split(':')[1].match(/\d+/g).join('')),
     ]);
 
-    return race(times, records);
+    return raceNicely(times, records);
 };
 
 console.time('part1');
