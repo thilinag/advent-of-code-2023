@@ -6,8 +6,8 @@ const part1Data = {
 };
 
 const part2Data = {
-    sample: ``,
-    answer: 0,
+    sample: part1Data.sample,
+    answer: 2,
 };
 
 const sampleData = [part1Data, part2Data];
@@ -20,18 +20,20 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-const processHistory = (history, last = []) => {
-    last.push(history.at(-1));
-    const differences = history.slice(1).map((n, i, arr) => {
-        if (i === 0) return null;
-        return n - arr[i - 1];
-    });
+const processHistory = (history, part2 = false, last = []) => {
+    last.push(history.at(part2 ? 0 : -1));
+    const differences = history
+        .map((n, i, arr) => {
+            if (i === 0) return null;
+            return n - arr[i - 1];
+        })
+        .filter((i) => i !== null);
 
     if (new Set(differences).size > 0) {
-        return processHistory(differences, last);
+        return processHistory(differences, part2, last);
     }
 
-    return last.reduce((sum, c) => sum + c, 0);
+    return last.reverse().reduce((sum, c) => (part2 ? c - sum : c + sum), 0);
 };
 
 const part1 = () => {
@@ -40,9 +42,8 @@ const part1 = () => {
 };
 
 const part2 = () => {
-    const data = getData(2);
-    // part 2 code
-    // return ;
+    const data = getData(2).map((line) => line.split(' ').map(Number));
+    return data.reduce((sum, line) => sum + processHistory(line, true), 0);
 };
 
 console.time('part1');
