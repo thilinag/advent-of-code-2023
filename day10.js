@@ -1,9 +1,9 @@
 const part1Data = {
-    sample: `.....
-.S-7.
-.|.|.
-.L-J.
-.....`,
+    sample: `7-F7-
+.FJ|7
+SJLL7
+|F--J
+LJ.LJ`,
     answer: 4,
 };
 
@@ -22,43 +22,72 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-/* 
-https://en.wikipedia.org/wiki/Breadth-first_search
- 1  procedure BFS(G, root) is
- 2      let Q be a queue
- 3      label root as explored
- 4      Q.enqueue(root)
- 5      while Q is not empty do
- 6          v := Q.dequeue()
- 7          if v is the goal then
- 8              return v
- 9          for all edges from v to w in G.adjacentEdges(v) do
-10              if w is not labeled as explored then
-11                  label w as explored
-12                  w.parent := v
-13                  Q.enqueue(w)
-*/
-const getLoop = (tiles, start) => {
+const getLoopLength = (tiles, start) => {
     const queue = [];
-    const visited = new Set();
-    const [row, col] = start;
+    let count = 0;
 
-    const key = `${row}-${col}`;
-    visited.add(key);
-
-    queue.push(key);
+    queue.push(start);
 
     while (queue.length > 0) {
         const currentKey = queue.shift();
-        const [row, col] = currentKey.split('-').map(Number);
+        const [row, col, prevRow, prevCol] = currentKey;
 
-        const neighbors = getNeighbors(tiles, row, col);
-        for (let neighbor of neighbors) {
-            // console.log(neighbor);
-            const [char, row, col] = neighbor
-                .split(' ')
-                .map((part, i) => (i === 0 ? part : Number(part)));
-            console.log({ char, row, col });
+        if (count > 0 && tiles[row][col] === 'S') break;
+
+        const next = getNext(tiles, row, col, prevRow, prevCol);
+        queue.push(next);
+        count++;
+    }
+    return count;
+};
+
+const getNext = (tiles, row, col, prevRow, prevCol) => {
+    const current = tiles[row][col];
+    switch (current) {
+        case 'S':
+            return [
+                ...getNeighbors(tiles, row, col)[0].split(' ').map(Number),
+                row,
+                col,
+            ];
+        case '|': {
+            return [prevRow > row ? row - 1 : row + 1, col, row, col];
+        }
+        case '-': {
+            return [row, prevCol > col ? col - 1 : col + 1, row, col];
+        }
+        case 'L': {
+            return [
+                prevRow === row ? row - 1 : row,
+                prevRow === row ? col : col + 1,
+                row,
+                col,
+            ];
+        }
+        case 'J': {
+            return [
+                prevRow === row ? row - 1 : row,
+                prevRow === row ? col : col - 1,
+                row,
+                col,
+            ];
+        }
+        case '7': {
+            return [
+                prevRow === row ? row + 1 : row,
+                prevRow === row ? col : col - 1,
+                row,
+                col,
+            ];
+        }
+
+        case 'F': {
+            return [
+                prevRow === row ? row + 1 : row,
+                prevRow === row ? col : col + 1,
+                row,
+                col,
+            ];
         }
     }
 };
@@ -69,40 +98,40 @@ const getNeighbors = (tiles, row, col) => {
     const neighbors = [];
 
     // up
-    if (row - 1 >= 0) {
-        neighbors.push(`${tiles[row - 1][col]} ${row - 1} ${col}`);
+    if (row - 1 >= 0 && ['|', 'F', '7'].includes(tiles[row - 1][col])) {
+        neighbors.push(`${row - 1} ${col}`);
     }
 
     // down
-    // console.log(maxRow, row + 1);
-    if (row + 1 <= maxRow) {
-        neighbors.push(`${tiles[row + 1][col]} ${row + 1} ${col}`);
+    if (row + 1 <= maxRow && ['|', 'J', 'L'].includes(tiles[row + 1][col])) {
+        neighbors.push(`${row + 1} ${col}`);
     }
 
     // right
-    if (col - 1 >= 0) {
-        neighbors.push(`${tiles[row][col - 1]} ${row} ${col - 1}`);
+    if (col - 1 >= 0 && ['-', 'J', '7'].includes(tiles[row][col - 1])) {
+        neighbors.push(`${row} ${col - 1}`);
     }
 
     // left
-    if (col + 1 <= maxCol) {
-        neighbors.push(`${tiles[row][col + 1]} ${row} ${col + 1}`);
+    if (col + 1 <= maxCol && ['-', 'F', 'L'].includes(tiles[row][col + 1])) {
+        neighbors.push(`${row} ${col + 1}`);
     }
 
-    return neighbors.filter((n) => !n.startsWith('.'));
+    // non dot neighbors
+    return neighbors.filter((n) => {
+        const [r, c] = n.split(' ');
+        return tiles[r][c] !== '.';
+    });
 };
 
 const part1 = () => {
     const data = getData(1).map((line) => line.split(''));
-    // console.log(data);
     const startRow = data.findIndex((line) => {
         return line.indexOf('S') > -1;
     });
     const startColumn = data[startRow].indexOf('S');
-    // console.log(startRow, startColumn);
-    getLoop(data, [startRow, startColumn]);
-    // part 1 code
-    // return ;
+    const loopLength = getLoopLength(data, [startRow, startColumn]);
+    return loopLength / 2;
 };
 
 const part2 = () => {
