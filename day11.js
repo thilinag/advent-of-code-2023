@@ -13,8 +13,8 @@ const part1Data = {
 };
 
 const part2Data = {
-    sample: ``,
-    answer: 0,
+    sample: part1Data.sample,
+    answer: 1030,
 };
 
 const sampleData = [part1Data, part2Data];
@@ -27,16 +27,16 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-const part1 = () => {
-    const data = getData(1).map((line) => line.split(''));
+const getGalaxyDistanceSum = (data, gapMultiplier = 2) => {
+    const matrix = data.map((line) => line.split(''));
     const emptyRows = [];
     const emptyCols = [];
     const galaxies = [];
 
     // find empty columns
-    data[0].forEach((_, column) => {
+    matrix[0].forEach((_, column) => {
         let isEmpty = true;
-        data.forEach((row) => {
+        matrix.forEach((row) => {
             if (row[column] === '#') {
                 isEmpty = false;
             }
@@ -48,7 +48,7 @@ const part1 = () => {
     });
 
     // find empty rows, find empty galaxies
-    data.forEach((row, i) => {
+    matrix.forEach((row, i) => {
         if (row.every((point) => point === '.')) {
             emptyRows.push(i);
         }
@@ -82,12 +82,13 @@ const part1 = () => {
             const minColumn = Math.min(galaxies[i][1], galaxies[j][1]);
             const maxColumn = Math.max(galaxies[i][1], galaxies[j][1]);
 
-            const emptyColsCount = emptyCols.filter(
-                (col) => col < maxColumn && col > minColumn,
-            ).length;
-            const emptyRowsCount = emptyRows.filter(
-                (row) => row < maxRow && row > minRow,
-            ).length;
+            const emptyColsCount =
+                emptyCols.filter((col) => col < maxColumn && col > minColumn)
+                    .length *
+                (gapMultiplier - 1);
+            const emptyRowsCount =
+                emptyRows.filter((row) => row < maxRow && row > minRow).length *
+                (gapMultiplier - 1);
 
             galaxyDistances.set(
                 key,
@@ -104,10 +105,14 @@ const part1 = () => {
     return [...galaxyDistances.values()].reduce((sum, dist) => sum + dist, 0);
 };
 
+const part1 = () => {
+    const data = getData(1);
+    return getGalaxyDistanceSum(data);
+};
+
 const part2 = () => {
     const data = getData(2);
-    // part 2 code
-    // return ;
+    return getGalaxyDistanceSum(data, 1000000);
 };
 
 console.time('part1');
