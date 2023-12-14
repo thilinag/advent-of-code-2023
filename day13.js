@@ -18,8 +18,8 @@ const part1Data = {
 };
 
 const part2Data = {
-    sample: ``,
-    answer: 0,
+    sample: part1Data.sample,
+    answer: 400,
 };
 
 const sampleData = [part1Data, part2Data];
@@ -41,23 +41,69 @@ const rotateMatrix = (matrix) => {
     });
 };
 
-const getReflectionResult = (pattern, isHorizontal = false) => {
-    for (let i = 0; i < pattern.length; i++) {
-        if (pattern[i] === pattern[i + 1]) {
-            const shortSide = Math.min(i, pattern.length - (i + 2));
-            let isHorizontalMirror;
-            isHorizontalMirror = true;
-            for (let j = 1; j <= shortSide; j++) {
-                if (pattern[i + j + 1] !== pattern[i - j]) {
-                    isHorizontalMirror = false;
+const getReflectionResult = (pattern, isHorizontal = false, part2 = false) => {
+    patternLoop: for (let i = 0; i < pattern.length; i++) {
+        const currentLine = pattern[i];
+        const nextLine = pattern[i + 1];
+
+        if (!nextLine) continue;
+
+        // check if pattern has a smudge
+        let smudge = part2 && levenshteinDistance(currentLine, nextLine) === 1;
+
+        // if either does not mirror or does not mirror with a smudge
+        if (currentLine !== nextLine && !smudge) continue;
+
+        const shortSide = Math.min(i, pattern.length - (i + 2));
+        // check if other lins are mirroring
+        for (let j = 1; j <= shortSide; j++) {
+            const currentLine = pattern[i + j + 1];
+            const nextLine = pattern[i - j];
+
+            // we are only allowed to have one smudge
+            if (smudge) {
+                // if we already detected a smudge other lines should match otherwise bail
+                if (currentLine !== nextLine) {
+                    continue patternLoop;
+                }
+            } else {
+                // detect smudge
+                if (part2 && levenshteinDistance(currentLine, nextLine) === 1) {
+                    smudge = true;
+                } else if (currentLine !== nextLine) {
+                    // bail if lines doesn't match
+                    continue patternLoop;
                 }
             }
+        }
 
-            if (isHorizontalMirror) {
-                return (i + 1) * (isHorizontal ? 100 : 1);
-            }
+        // in part 2 check if have detected a smudge
+        // horizontal mirroring needs row count before mirror * 100, vertical mirroring needs column count before mirror
+        if (!part2 || smudge) {
+            return (i + 1) * (isHorizontal ? 100 : 1);
         }
     }
+};
+
+// https://en.wikipedia.org/wiki/Levenshtein_distance
+const levenshteinDistance = (s, t) => {
+    if (!s.length) return t.length;
+    if (!t.length) return s.length;
+    const arr = [];
+    for (let i = 0; i <= t.length; i++) {
+        arr[i] = [i];
+        for (let j = 1; j <= s.length; j++) {
+            arr[i][j] =
+                i === 0
+                    ? j
+                    : Math.min(
+                          arr[i - 1][j] + 1,
+                          arr[i][j - 1] + 1,
+                          arr[i - 1][j - 1] + (s[j - 1] === t[i - 1] ? 0 : 1),
+                      );
+        }
+    }
+    return arr[t.length][s.length];
 };
 
 const part1 = () => {
@@ -80,9 +126,25 @@ const part1 = () => {
 };
 
 const part2 = () => {
-    const data = getData(2);
-    // part 2 code
-    // return ;
+    const data = getData(2).map((pattern) => pattern.split('\n'));
+    // https://stackoverflow.com/questions/18050932/detect-differences-between-two-strings-with-javascript
+    // https://en.wikipedia.org/wiki/Levenshtein_distance
+
+    return data
+        .map((pattern, index) => {
+            const horizontalReflectionResult = getReflectionResult(
+                pattern,
+                true,
+                true,
+            );
+
+            if (horizontalReflectionResult) {
+                return horizontalReflectionResult;
+            } else {
+                return getReflectionResult(rotateMatrix(pattern), false, true);
+            }
+        })
+        .reduce((sum, c) => sum + c, 0);
 };
 
 console.time('part1');
