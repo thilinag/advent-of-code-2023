@@ -4,12 +4,21 @@ const part1Data = {
 SJLL7
 |F--J
 LJ.LJ`,
-    answer: 4,
+    answer: 8,
 };
 
 const part2Data = {
-    sample: ``,
-    answer: 0,
+    sample: `FF7FSF7F7F7F7F7F---7
+L|LJ||||||||||||F--J
+FL-7LJLJ||||||LJL-77
+F--JF--7||LJLJ7F7FJ-
+L---JF-JLJ.||-FJLJJ7
+|F|F-JF---7F7-L7L|7|
+|FFJF7L7F-JF7|JL---7
+7-L-JL7||F7|L7F-7F7|
+L.L7LFJ|||||FJL7||LJ
+L7JLJL-JLJLJL--JLJ.L`,
+    answer: 10,
 };
 
 const sampleData = [part1Data, part2Data];
@@ -22,8 +31,21 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-const getLoopLength = (tiles, start) => {
+// Shoelace algorithm
+// https://en.wikipedia.org/wiki/Shoelace_formula
+const getArea = (polygon) => {
+    let area = 0;
+    for (let i = 0; i < polygon.length; i++) {
+        const [x1, y1] = polygon[i];
+        const [x2, y2] = polygon[(i + 1) % polygon.length];
+        area += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(area) / 2;
+};
+
+const getLoopData = (tiles, start, part2 = false) => {
     const queue = [];
+    const turns = [];
     let count = 0;
 
     queue.push(start);
@@ -34,17 +56,18 @@ const getLoopLength = (tiles, start) => {
 
         if (count > 0 && tiles[row][col] === 'S') break;
 
-        const next = getNext(tiles, row, col, prevRow, prevCol);
+        const next = getNext(tiles, row, col, prevRow, prevCol, turns);
         queue.push(next);
         count++;
     }
-    return count;
+    return part2 ? [turns, count] : count;
 };
 
-const getNext = (tiles, row, col, prevRow, prevCol) => {
+const getNext = (tiles, row, col, prevRow, prevCol, turns) => {
     const current = tiles[row][col];
     switch (current) {
         case 'S':
+            turns.push([row, col]);
             return [
                 ...getNeighbors(tiles, row, col)[0].split(' ').map(Number),
                 row,
@@ -57,6 +80,7 @@ const getNext = (tiles, row, col, prevRow, prevCol) => {
             return [row, prevCol > col ? col - 1 : col + 1, row, col];
         }
         case 'L': {
+            turns.push([row, col]);
             return [
                 prevRow === row ? row - 1 : row,
                 prevRow === row ? col : col + 1,
@@ -65,6 +89,7 @@ const getNext = (tiles, row, col, prevRow, prevCol) => {
             ];
         }
         case 'J': {
+            turns.push([row, col]);
             return [
                 prevRow === row ? row - 1 : row,
                 prevRow === row ? col : col - 1,
@@ -73,6 +98,7 @@ const getNext = (tiles, row, col, prevRow, prevCol) => {
             ];
         }
         case '7': {
+            turns.push([row, col]);
             return [
                 prevRow === row ? row + 1 : row,
                 prevRow === row ? col : col - 1,
@@ -82,6 +108,7 @@ const getNext = (tiles, row, col, prevRow, prevCol) => {
         }
 
         case 'F': {
+            turns.push([row, col]);
             return [
                 prevRow === row ? row + 1 : row,
                 prevRow === row ? col : col + 1,
@@ -130,14 +157,18 @@ const part1 = () => {
         return line.indexOf('S') > -1;
     });
     const startColumn = data[startRow].indexOf('S');
-    const loopLength = getLoopLength(data, [startRow, startColumn]);
+    const loopLength = getLoopData(data, [startRow, startColumn]);
     return loopLength / 2;
 };
 
 const part2 = () => {
-    const data = getData(2);
-    // part 2 code
-    // return ;
+    const data = getData(2).map((line) => line.split(''));
+    const startRow = data.findIndex((line) => {
+        return line.indexOf('S') > -1;
+    });
+    const startColumn = data[startRow].indexOf('S');
+    const loopData = getLoopData(data, [startRow, startColumn], true);
+    return getArea(loopData[0]) - loopData[1] / 2 + 1;
 };
 
 console.time('part1');
