@@ -31,7 +31,7 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-// Shoelace algorithm
+// Shoelace formula
 // https://en.wikipedia.org/wiki/Shoelace_formula
 const getArea = (polygon) => {
     let area = 0;
@@ -72,6 +72,10 @@ const part1 = () => {
     }
 
     // area covered = inside area + edges
+    // Pick's theorem
+    // https://en.wikipedia.org/wiki/Pick%27s_theorem
+    // A = i + (b/2) - 1;
+    // i + b = A + (b/2) + 1
     return getArea(polygon) + edgeCount / 2 + 1;
 };
 
@@ -108,6 +112,10 @@ const part2 = () => {
     }
 
     // area covered = inside area + edges
+    // Pick's theorem
+    // https://en.wikipedia.org/wiki/Pick%27s_theorem
+    // A = i + (b/2) - 1;
+    // i + b = A + (b/2) + 1
     return getArea(polygon) + edgeCount / 2 + 1;
 };
 

@@ -31,7 +31,7 @@ const getData = (part) => {
     return input.split('\n');
 };
 
-// Shoelace algorithm
+// Shoelace formula
 // https://en.wikipedia.org/wiki/Shoelace_formula
 const getArea = (polygon) => {
     let area = 0;
@@ -168,6 +168,10 @@ const part2 = () => {
     });
     const startColumn = data[startRow].indexOf('S');
     const loopData = getLoopData(data, [startRow, startColumn], true);
+    // Pick's theorem
+    // https://en.wikipedia.org/wiki/Pick%27s_theorem
+    // A = i + (b/2) - 1;
+    // i = A - (b/2) + 1
     return getArea(loopData[0]) - loopData[1] / 2 + 1;
 };
 
